@@ -9,6 +9,16 @@ $(document).ready(function() {
   });
   return uuid;
 };
+
+function getUrlParameter(name) {
+    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+    var results = regex.exec(location.search);
+    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+};
+
+  var oauth_token = getUrlParameter('token');
+  var username = getUrlParameter('username');
   var currentdate = new Date(); 
   var datetime = currentdate.getFullYear()+ "-"
                 + currentdate.getDate() + "-"
@@ -21,14 +31,11 @@ $(document).ready(function() {
       title: 'Template title',
       status: "new", 
       description: 'Template description',
-      dateCreated: datetime,
-      dateUpdated: datetime,
-      url: "http://www.google.com", 
+      urls: "http://www.google.com", 
       materials: "https://image.freepik.com/free-photo/cute-cat-picture_1122-449.jpg", 
       project: "",
       severity: "", 
-      datasets: "dataset-id#version",
-      facets: null
+      datasets: "dataset-id#version"
   });
   var projectAttributes = new Backbone.Model();
   var jsonFacets = {
@@ -184,8 +191,8 @@ $(document).ready(function() {
       required: true
     },
     {
-      name: "url",
-      label: "URL",
+      name: "urls",
+      label: "URLS",
       control: "input",
       value: "",
       required: false
@@ -261,7 +268,7 @@ $(document).ready(function() {
       jsonIssue.datasets = jsonIssue.datasets.split(',');
       //Optional fields to be treated like so.
       jsonIssue.materials = jsonIssue.materials.split(',');
-      jsonIssue.url = jsonIssue.url.split(','); 
+      jsonIssue.urls = jsonIssue.urls.split(','); 
       globalJsonIssue = jsonIssue;
       $("#jsonPreview").text(JSON.stringify(jsonIssue, null, 2));
   });
@@ -294,7 +301,7 @@ issueData.on('change', function(){
       jsonIssue.datasets = jsonIssue.datasets.split(',');
       //Optional fields to be treated like so.
       jsonIssue.materials = jsonIssue.materials.split(',');
-      jsonIssue.url = jsonIssue.url.split(','); 
+      jsonIssue.urls = jsonIssue.urls.split(','); 
       globalJsonIssue = jsonIssue;
       $("#jsonPreview").text(JSON.stringify(jsonIssue, null, 2));
   });
@@ -346,5 +353,5 @@ return false;
 
 
 
- 
+
 });
