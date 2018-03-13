@@ -1,6 +1,5 @@
 $(document).ready(function() {
-  
- function generateUUID() {
+function generateUUID() {
   var d = new Date().getTime();
   var uuid = 'xxxxxxxx-xxxx-xxxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
       var r = (d + Math.random()*16)%16 | 0;
@@ -10,12 +9,14 @@ $(document).ready(function() {
   return uuid;
 };
 
+
 function getUrlParameter(name) {
     name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
     var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
     var results = regex.exec(location.search);
     return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
 };
+
 
   var oauth_token = getUrlParameter('token');
   var username = getUrlParameter('username');
@@ -37,6 +38,7 @@ function getUrlParameter(name) {
       severity: "", 
       datasets: "dataset-id#version"
   });
+  $("#jsonPreview").text(JSON.stringify(issueData.toJSON(), null, 2));
   var projectAttributes = new Backbone.Model();
   var jsonFacets = {
         "default": [
@@ -235,35 +237,11 @@ function getUrlParameter(name) {
     }
   }
 
-  var errataFacets = new Backbone.Model();
-  var additionalFormChanged = false;
+  // var errataFacets = new Backbone.Model();
+  // var additionalFormChanged = false;
   var globalJsonIssue = null;
   issueData.on('refresh', function(){
-      // console.log('change triggered.')
       jsonIssue = issueData.toJSON();
-      if(additionalFormChanged){
-        jsonIssue = issueData.toJSON();
-        if(issueData.hasChanged(['project'])){
-          console.log('Refreshing...')
-        }
-        additionalForm = new Backform.Form({
-          el: $("#additional-form"),
-          model: errataFacets,
-          fields: jsonFacets[issueData.get('project')],
-          events:{
-            "change": function(e){
-              jsonIssue['facets'] = this.model.toJSON();
-              reformatJson(jsonIssue);
-   
-            }
-          }
-        }).render();
-      }
-      if(typeof additionalForm !== 'undefined'){
-        jsonIssue['facets'] = additionalForm.model.toJSON();
-        reformatJson(jsonIssue);
-      };  
-      additionalFormChanged = false;
       clean(jsonIssue);
       jsonIssue.datasets = jsonIssue.datasets.split(',');
       //Optional fields to be treated like so.
@@ -274,29 +252,7 @@ function getUrlParameter(name) {
   });
 
 issueData.on('change', function(){
-      // console.log('change triggered.')
       jsonIssue = issueData.toJSON();
-      errataFacets = new Backbone.Model();
-      if(issueData.hasChanged(['project'])){
-        jsonIssue = issueData.toJSON();
-        additionalForm = new Backform.Form({
-          el: $("#additional-form"),
-          model: errataFacets,
-          fields: jsonFacets[issueData.get('project')],
-          events:{
-            "change": function(e){
-              jsonIssue['facets'] = this.model.toJSON();
-              reformatJson(jsonIssue);
-   
-            }
-          }
-        }).render();
-      }
-      if(typeof additionalForm !== 'undefined'){
-        jsonIssue['facets'] = additionalForm.model.toJSON();
-        reformatJson(jsonIssue);
-      };  
-      additionalFormChanged = false;
       clean(jsonIssue);
       jsonIssue.datasets = jsonIssue.datasets.split(',');
       //Optional fields to be treated like so.
@@ -306,52 +262,40 @@ issueData.on('change', function(){
       $("#jsonPreview").text(JSON.stringify(jsonIssue, null, 2));
   });
 
-$('#additional-form').on("change",function(){
-    additionalFormChanged = true;
-    issueData.trigger("refresh", issueData, {});
-  });
-
-
 $('#submitButton').on('click',function(){
 jsonData = globalJsonIssue;
 //here send request to errata ws
-// username = 'AtefBN';
-// access_token = '2836ed612e2859ca38f8293521b441f256f8ffee';
-console.log('using oauth token')
-var errata_form_request = new XMLHttpRequest();
-var errata_ws = "http://localhost:5001/1/issue/create";
-var data = jsonData;
-errata_form_request.open("POST", errata_ws, true);
-//Send the proper header information along with the request
-errata_form_request.setRequestHeader("Content-type", "application/json");
-// errata_form_request.setRequestHeader("Content-length", data.length);
-errata_form_request.setRequestHeader("Connection", "keep-alive");
-if(typeof oauth_token === undefined){
-  alert('Token expired please authenticate.');
-}
-errata_form_request.setRequestHeader("Authorization", "Basic "+btoa(oauth_token+':'+username));
-errata_form_request.onreadystatechange = function() {//Call a function when the state changes.
-  if(errata_form_request.readyState == 4 && errata_form_request.status == 200) {
-    alert("Success, issue can be viewed on  https://test-errata.es-doc.org/viewer.html?uid="+jsonData['uid']);
-  }
-  else if(errata_form_request.status == 401){
-    alert("User authentication failed.");
-  }
-  else if(errata_form_request.status == 403){
-    alert("User authorization failed, if you think this is a mistake, contact es-doc errata admins.");
-  }
-  else if(errata_form_request.status == 404){
-    alert("Servers down.");
-  }
-}
-jsonData = data;
-console.log(JSON.stringify(jsonData));
-errata_form_request.send(JSON.stringify(data));
+      console.log('using oauth token')
+      var errata_form_request = new XMLHttpRequest();
+      var errata_ws = "http://localhost:5001/1/issue/create";
+      var data = jsonData;
+      errata_form_request.open("POST", errata_ws, true);
+      //Send the proper header information along with the request
+      errata_form_request.setRequestHeader("Content-type", "application/json");
+      // errata_form_request.setRequestHeader("Content-length", data.length);
+      errata_form_request.setRequestHeader("Connection", "keep-alive");
+      if(typeof oauth_token === undefined){
+        alert('Token expired please authenticate.');
+      }
+      errata_form_request.setRequestHeader("Authorization", "Basic "+btoa(oauth_token+':'+username));
+      errata_form_request.onreadystatechange = function() {//Call a function when the state changes.
+        if(errata_form_request.readyState == 4 && errata_form_request.status == 200) {
+          alert("Success, issue can be viewed on  https://test-errata.es-doc.org/viewer.html?uid="+jsonData['uid']);
+        }
+        else if(errata_form_request.status == 401){
+          alert("User authentication failed.");
+        }
+        else if(errata_form_request.status == 403){
+          alert("User authorization failed, if you think this is a mistake, contact es-doc errata admins.");
+        }
+        else if(errata_form_request.status == 404){
+          alert("Servers down.");
+        }
+      }
+      jsonData = data;
+      console.log(JSON.stringify(jsonData));
+      errata_form_request.send(JSON.stringify(data));
 
-return false;
-});
-
-
-
-
+      return false;
+    });
 });
