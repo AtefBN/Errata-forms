@@ -12,13 +12,43 @@ var issueModel = Backbone.Model.extend({
           return Backbone.sync('create', model, options);
         },
         validate: function(attrs, options) {
-          if (attrs.title.length < 2) {
+          if (attrs.title.length < 5) {
             this.errorModel.clear();
-            this.errorModel.set({Title: "Must be longer than 5 characters."});
+            this.errorModel.set({Title: "Title length requirement"});
             if (!_.isEmpty(_.compact(this.errorModel.toJSON())))
-                return "Validation errors. Please fix.";
+                return "Title must be longer than 5 characters.";
+          }
+          else if (attrs.description.length < 10) {
+            this.errorModel.clear();
+            this.errorModel.set({Description: "Description length requirement"});
+            if (!_.isEmpty(_.compact(this.errorModel.toJSON())))
+                return "Description must be longer than 10 characters.";
+          } 
+          else if (attrs.datasets.length <1){
+            this.errorModel.clear();
+            this.errorModel.set({datasets: "Dataset list can't be empty"});
+            if (!_.isEmpty(_.compact(this.errorModel.toJSON())))
+                return "Dataset list for the issue can't be empty.";   
+          }
+          
+          //Test Materials and urls regex
+          else if (attrs.materials.length>0 || attrs.urls.length>0){
+            if (attrs.materials.length>0){
+              var materialsArray = attrs.materials.split(',');
+              var materialsPattern = /([a-z\-_0-9\/\:\.]*\.(jpg|jpeg|png|gif))/i;
+              for (var i in materialsArray){
+                var materialsValid = materialsPattern.test(materialsArray[i]);
+              }  
+            }
+            if (attrs.urls.length>0){
+              var urlsArray = attrs.urls.split(',');
+              var urlsPattern = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+              for (var j in urlsArray){
+                var urlsValid = urlsPattern.test(urlsArray[j]);
+              }
             }
         }
+      }
 });
 
 
@@ -28,7 +58,7 @@ var issueData = new issueModel({
       status: "new", 
       description: 'Template description',
       urls: "http://www.url1.com,http://www.url2.com", 
-      materials: "http://www.materials.com/1,https://www.materials.com/2", 
+      materials: "http://www.materials.com/1.jpeg,https://www.materials.com/2.png", 
       project: "cmip6",
       severity: "low", 
       datasets: "dataset-id1#version,dataset-id2#version"
@@ -41,11 +71,11 @@ var issueData = new issueModel({
 
 $("#jsonPreview").text(JSON.stringify(issueData.toJSON(), null, 2));
 
-myform = new Backform.Form({
+myForm = new Backform.Form({
   el: "#form-errata",
   model: issueData,
   fields: [
-  {
+      {
     name: "uid",
     label: "UUID",
     control: "input",
@@ -124,46 +154,45 @@ myform = new Backform.Form({
     control: "textarea",
     required: true,
     helpMessage: "Paste the affected dataset list seperate by a comma"
-  },
-  {
-    id: 'yo',
-    control: 'button'
-  },
-
-  { label: "Validation Result",    
-    id: "issueValidation",
-    control: "input",
   }
   ]
 }).render();
 
-// Creating an auxiliary issueData model to avoid triggering extra changes.
+// Creating an auxiliary issueData model to avoid triggering extra unneeded change event.
 issueData.on('change', function(){
       // jsonIssue = issueData.toJSON();
       jsonIssue = issueData.clone();
       jsonIssue.set('datasets', String(jsonIssue.get('datasets')).split(','));
       jsonIssue.set('materials', String(jsonIssue.get('materials')).split(','));
-      jsonIssue.set('urls', String(jsonIssue.get('urls')).split(',')); 
-      $("#jsonPreview").text(JSON.stringify(jsonIssue, null, 2));
+      jsonIssue.set('urls', String(jsonIssue.get('urls')).split(','));
+      if (myForm.model.isValid()){
+        var additionalText = 'Validation successful';
+        isValid = true;
+      }
+      else {
+        var additionalText = 'Validation failed: '+myForm.model.validationError;
+        isValid = false;
+      }
+      $("#jsonPreview").text(JSON.stringify(jsonIssue, null, 2) + '\n' + additionalText);
 });
 
 
-$("#form-errata").on("change", function(e){
-  var submit = myform.fields.get("yo");
-  if (myform.model.isValid())
-    submit.set({status:"success", message:"success"});
-  else
-    submit.set({status:"error", message:myform.model.validationError});
-});
+// $("#form-errata").on("change", function(e){
+//   var submit = myForm.fields.get("submitButton");
+//   if (myForm.model.isValid())
+//     submit.set({status:"success", message:"success"});
+//   else
+//     submit.set({status:"error", message:myForm.model.validationError});
+// });
 
-$("#form-errata").on("submit",function(e){
+myForm.$el.on("submit",function(e){
   console.log('down here');
-  issueData.set('datasets' , jsonIssue.get('datasets'));
-  issueData.set('materials', jsonIssue.get('materials'));
-  issueData.set('urls', jsonIssue.get('urls'))
-;  // issueData.on('invalid', function(model, error){
+  // issueData.set('datasets' , jsonIssue.get('datasets'));
+  // issueData.set('materials', jsonIssue.get('materials'));
+  // issueData.set('urls', jsonIssue.get('urls'));
+  // issueData.on('invalid', function(model, error){
   // })
-  issueData.save();
+  // issueData.save();
 
   console.log('Successfully requested issue creation...');
 });
