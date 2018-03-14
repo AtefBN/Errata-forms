@@ -32,8 +32,18 @@ var issueModel = Backbone.Model.extend({
           }
           
           //Test Materials and urls regex
-          else if (attrs.materials.length>0 || attrs.urls.length>0){
+          else if (attrs.materials.length>0 || attrs.urls.length>0 || attrs.datasets.length>0){
+            if (attrs.datasets.length > 0){
+              console.log('datasets validation');
+              var datasetArray = attrs.datasets.split(',');
+              var datasetPattern = /\w#\w|\w\.v\w/i;
+              for (var i in datasetArray){
+                var datasetValid = datasetPattern.test(datasetArray[i]);
+                console.log(datasetValid, datasetArray[i]);
+              }
+            }
             if (attrs.materials.length>0){
+              console.log('materials validation');
               var materialsArray = attrs.materials.split(',');
               var materialsPattern = /([a-z\-_0-9\/\:\.]*\.(jpg|jpeg|png|gif))/i;
               for (var i in materialsArray){
@@ -41,6 +51,7 @@ var issueModel = Backbone.Model.extend({
               }  
             }
             if (attrs.urls.length>0){
+              console.log('urls validation');
               var urlsArray = attrs.urls.split(',');
               var urlsPattern = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
               for (var j in urlsArray){
