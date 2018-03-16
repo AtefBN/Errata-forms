@@ -1,79 +1,46 @@
 <!DOCTYPE html>
-<header>
-	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
-    <meta content="utf-8" http-equiv="encoding">
-    <title>ESDoc-ERRATA Issue creation form</title>
+<header class="main">
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <img src="media/img/logo.png"
+         alt="Earth System Documentation"
+         title="Earth System Documentation"
+         class="pull-left esdoc-logo" />
+    <h1 class="pull-right">
+        <button class="esdoc-support btn btn-primary">Support</button>
+        <button class="esdoc-pid-lookup btn btn-success">PID Lookup</button>
+    </h1>
 </header>
-<script src="3rd/jquery.min.js" type="text/javascript"></script>
-<script src="3rd/bootstrap2.3.min.js" type="text/javascript"></script>
-<link href="3rd/bootstrap2.3.min.css" rel="stylesheet" type="text/css" charset="utf-8">
-<script src="3rd/bootstrap-datepicker.js" type="text/javascript"></script>
-<link href="3rd/bootstrap-datepicker.css" rel="stylesheet" type="text/css" charset="utf-8">
-    
-<script src="3rd/underscore.js" type="text/javascript"></script>
-<script src="3rd/backbone.js" type="text/javascript"></script>
-    
-<script src="3rd/backform.js" type="text/javascript"></script>
 
-<script src="utils.js" type="text/javascript"></script>
-<!-- <script src="oauth.js" type="text/javascript"></script> -->
-<script src="dev_form.js" type="text/javascript"></script>
+<link href="ext/forms/bootstrap2.3.min.css" rel="stylesheet" type="text/css" charset="utf-8">
 
-<!-- <script src="form.js" type="text/javascript"></script> -->
-<!-- <script src="test.js" type="text/javascript"></script> -->
+<script src="ext/jquery-2.2.3.min.js" type="text/javascript"></script>
+<script src="ext/bootstrap-3.3.6/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="ext/bootstrap-3.3.6/js/bootstrap.js" type="text/javascript"></script>
+<script src="ext/underscore-1.8.3.min.js" type="text/javascript"></script>
+<script src="ext/backbone-1.3.3.min.js" type="text/javascript"></script>
+<script src="ext/forms/backform.js" type="text/javascript"></script>
 
-<style type="text/css">     
-  .myForm
-  {
-    width: 420px;
-    margin-left: auto;
-    margin-right: auto;
-    position: absolute;
-    text-align: center;
-    display: inline-block;
-  }
-  
-  .additionalForm
-  {
-    width: 420px;
-    margin-left: 480px;
-    margin-right: auto;
-    position: relative;  
-  }
+<!-- Local scripts -->
+<script src="media/js/forms/utils.js" type="text/javascript"></script>
+<script src="media/js/forms/form.js" type="text/javascript"></script>
 
-  .preview
-  {
-    width: 420px;
-    margin-left: 480px;
-    margin-top: 20px;
-    position: relative;
-  }
-  .h1
-  {
-    margin: auto;
-  }
-  .control-label{
-    white-space: nowrap;
-    max-width: 100px;
-    overflow: hidden;
-    float:left;
-    display: inline-block; 
-    width: 130px;
-    text-align: right;
-    padding-right: 7px;
-    font-size: 11px;
-    color: #666;
-    font-weight: bold;
-  }
-  .input-xlarge{
-    padding: 3px;
-    display: inline-block;
-    width: 290px;
-    border: 1px solid #BDC7D8;
-    border-image: initial;
-    margin: 0px;
-    font-size: 12px;
-  }
+<!-- CSS -->
+<style type="text/css">
+    .myForm{
+        margin-left: -160px;
+        margin-inline-start: -160px;
+        text-align: center;
+    }
+    .preview
+    {
+        width: 500px;
+        position: relative;
+    }
+
+    .guidelines
+    {
+        width: 500px;
+    }
 </style>
 <br/>
 
@@ -82,13 +49,37 @@
   Backform.bootstrap2();
 
 </script>
-<div class="container">
-    <h3>ESDoc-ERRATA Issue Creation Form</h3>
-    <form class="myForm">
-      <div  id="form-errata"></div>
-    </form>
-<div class="preview">
-  <h3>Issue preview</h3>
-  <pre id='jsonPreview'>
-  </pre>
+<body>
+
+<div class="wrap">
+    <div class="container">
+        <div class="span5">
+            <form id='myForm' class="form-horizontal">
+                <h3>Issue Creation Form</h3>
+                <div  id="form-errata"></div>
+            </form>
+        </div>
+        <div class="span5">
+            <div id = 'preview' class="preview">
+                <h3>Issue preview</h3>
+                <pre id='jsonPreview'/>
+            </div>
+        </div>
+        <div class="span5">
+          <div id='guidelines'>
+            <h3>Issue creation guidelines</h3>
+            <li>Title string must exceed 5 characters.</li>
+            <li>Description must exceed 10 characters.</li>
+            <li>URLS, materials are optional.</li>
+            <li>If URLS or materials are provided they must be valid URL strings.</li>
+            <li>Materials should point towards an image file (png, jpeg, gif, tiff).</li>
+            <li>Dataset-ids list can't be empty.</li>
+            <li>Dataset-id must be in the form datasetid#version or datasetid.Vversion.</li>
+          </div>
+        </div>
+    </div>
+</div>
+
+
+</body>
 </html>

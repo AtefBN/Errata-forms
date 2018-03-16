@@ -88,8 +88,7 @@ var issueData = new issueModel({
     }
 );
 
-
-$("#jsonPreview").text(JSON.stringify(issueData.toJSON(), null, 2));
+$("#jsonPreview").text('Your issue preview will go here.');
 
 
 myForm = new Backform.Form({
@@ -186,10 +185,8 @@ myForm = new Backform.Form({
 
 // Creating an auxiliary issueData model to avoid triggering extra unneeded change event.
 issueData.on('change', function(){
-      // jsonIssue = issueData.toJSON();
       var submit = myForm.fields.get("submitButton");
       jsonIssue = issueData.clone();
-
       jsonIssue.set('datasets', splitListAndClean(jsonIssue.get('datasets'), ','));
       jsonIssue.set('materials', splitListAndClean(jsonIssue.get('materials'), ','));
       jsonIssue.set('urls', splitListAndClean(jsonIssue.get('urls'), ','));
